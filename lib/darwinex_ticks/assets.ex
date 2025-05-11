@@ -4,7 +4,7 @@ defmodule DarwinexTicks.Assets do
   require Explorer.DataFrame, as: DF
 
   alias DarwinexTicks.Cache
-  alias DarwinexTicks.DataFrameExporter
+  alias DarwinexTicks.DataFrameHelpers
   alias DarwinexTicks.{FTP, FTPPool}
 
   @assets_timeout :timer.seconds(5)
@@ -46,14 +46,14 @@ defmodule DarwinexTicks.Assets do
     filenames
     |> Task.async_stream(&read_file!(asset, &1), opts)
     |> Stream.map(fn {:ok, value} -> value end)
-    |> Stream.map(&DataFrameExporter.load_csv!/1)
+    |> Stream.map(&DataFrameHelpers.load_csv!/1)
     |> Stream.flat_map(&DF.to_rows_stream(&1, atom_keys: true))
   end
 
   def file_to_dataframe!(asset, filename) when is_binary(filename) do
     asset
     |> read_file!(filename)
-    |> DataFrameExporter.load_csv!()
+    |> DataFrameHelpers.load_csv!()
   end
 
   def files_to_dataframe!(asset, filenames, timeout \\ :timer.minutes(1))
@@ -63,7 +63,7 @@ defmodule DarwinexTicks.Assets do
     filenames
     |> Task.async_stream(&read_file!(asset, &1), opts)
     |> Stream.map(fn {:ok, value} -> value end)
-    |> Stream.map(&DataFrameExporter.load_csv!/1)
+    |> Stream.map(&DataFrameHelpers.load_csv!/1)
     |> Enum.to_list()
     |> DF.concat_rows()
   end
