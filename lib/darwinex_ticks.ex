@@ -343,7 +343,7 @@ defmodule DarwinexTicks do
     |> DF.mutate(bid: fill_missing(bid, :forward), ask: fill_missing(ask, :forward))
     # Sometime rows are empty (time, bid and ask)
     # eg. XAUUSD_BID_2017-10-27_20.log.gz
-    |> DF.drop_nil()
+    |> DF.drop_nil([:time, :bid, :ask])
   end
 
   defp maybe_filename_to_dataframe(_asset, nil, _, _), do: nil
